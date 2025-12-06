@@ -1,4 +1,4 @@
-name: foundation_stereo
+name: tiptop-foundation_stereo
 channels:
   - pytorch
   - nvidia
