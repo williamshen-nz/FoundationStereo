@@ -56,7 +56,7 @@ This will run both the server and a client that sends test images and displays t
 
 <img src="./teaser/expected-depth.png" width="500"/>
 
-After you've verified it's working, press `Ctrl+B`, then `D` to detach from the tmux session. The script will automatically tear down and exit.
+After you've verified it's working, press `q` to close the cv2 window. Then in tmux, press `Ctrl+B`, then `D` to detach from the tmux session. The script will automatically tear down and exit.
 
 ## Running the Inference Server
 
