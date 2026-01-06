@@ -10,6 +10,7 @@ import os, sys
 import io
 import time
 import numpy as np
+from contextlib import asynccontextmanager
 
 code_dir = os.path.dirname(os.path.realpath(__file__))
 sys.path.append(f"{code_dir}/../")
@@ -22,8 +23,6 @@ from omegaconf import OmegaConf
 from core.utils.utils import InputPadder
 from Utils import *
 from core.foundation_stereo import *
-
-app = FastAPI(title="FoundationStereo Server")
 
 # Global model instance
 model = None
@@ -109,14 +108,19 @@ def run_inference(img0_rgb: np.ndarray, img1_rgb: np.ndarray,
     return depth
 
 
-@app.on_event("startup")
-async def startup_event():
+@asynccontextmanager
+async def lifespan(app: FastAPI):
     """Initialize model on startup"""
     ckpt_dir = f"{code_dir}/pretrained_models/23-51-11/model_best_bp2.pth"
     set_logging_format()
     set_seed(0)
     torch.autograd.set_grad_enabled(False)
     load_model_at_startup(ckpt_dir)
+    yield
+    # Cleanup code would go here if needed
+
+
+app = FastAPI(title="FoundationStereo Server", lifespan=lifespan)
 
 
 @app.post("/infer")
@@ -256,6 +260,42 @@ async def health_check():
     }
 
 
-if __name__ == "__main__":
+def main():
+    """Run the FastAPI server."""
+    import argparse
+    parser = argparse.ArgumentParser(
+        description='FoundationStereo Server'
+    )
+    parser.add_argument(
+        '--host',
+        type=str,
+        default='0.0.0.0',
+        help='Host to bind the server to (default: 0.0.0.0)'
+    )
+    parser.add_argument(
+        '--port',
+        type=int,
+        default=1234,
+        help='Port to bind the server to (default: 1234)'
+    )
+
+    args = parser.parse_args()
+
+    print("=" * 80)
+    print("Starting FoundationStereo Server")
+    print(f"  Host: {args.host}")
+    print(f"  Port: {args.port}")
+    print("=" * 80)
+
+    # Run server
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=1234)
+    uvicorn.run(
+        app,
+        host=args.host,
+        port=args.port,
+        log_level="info"
+    )
+
+
+if __name__ == '__main__':
+    main()
