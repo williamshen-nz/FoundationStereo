@@ -36,7 +36,7 @@ cd FoundationStereo
 # Install dependencies (this may take a few minutes)
 pixi run setup
 
-# Download pretrained weights
+# Download pretrained checkpoints
 pixi run download-checkpoints
 ```
 
