@@ -64,7 +64,7 @@ Make sure you're in the project root directory, then run:
 
 ```bash
 # Start the server (runs scripts/server.py)
-# Default: listens on all interfaces at http://0.0.0.0:8000
+# Default: listens on all interfaces at http://0.0.0.0:1234
 pixi run server
 ```
 
