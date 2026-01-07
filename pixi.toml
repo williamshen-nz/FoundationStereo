@@ -1,0 +1,55 @@
+[workspace]
+name = "foundation_stereo"
+version = "0.1.0"
+channels = ["conda-forge"]
+platforms = ["linux-64"]
+
+[system-requirements]
+cuda = "12"
+
+[dependencies]
+python = "3.11.*"
+pip = "*"
+pytorch-gpu = "==2.4.1"
+torchvision = "==0.19.1"
+scikit-image = "*"
+omegaconf = "*"
+imgaug = "*"
+ninja = "*"
+timm = "*"
+albumentations = "*"
+jupyterlab = "*"
+scipy = "*"
+joblib = "*"
+scikit-learn = "*"
+"ruamel.yaml" = "*"
+trimesh = "*"
+pyyaml = "*"
+imageio = "*"
+open3d = "*"
+transformations = "*"
+einops = "*"
+gdown = "*"
+nodejs = "*"
+huggingface_hub = "*"
+fastapi = "*"
+uvicorn = "*"
+python-multipart = "*"
+unzip = "*"
+pandas = "*"
+
+[pypi-dependencies]
+opencv-contrib-python = "*"
+
+[tasks]
+# Install local packages (run after pixi install)
+setup = "pip install flash-attn --no-build-isolation"
+
+# Download model weights
+download-checkpoints = "gdown 'https://drive.google.com/uc?id=1mSie9ZGfoRfDkdTs6oydkfct70C4-ArF' && unzip pretrained_models.zip"
+
+# Run demo
+demo = "./scripts/run_server_client_demo.sh"
+
+# Run inference server
+server = "python scripts/server.py"

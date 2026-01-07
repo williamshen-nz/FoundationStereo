@@ -7,7 +7,6 @@ cd "$SCRIPT_DIR/.."
 
 # Configuration
 SESSION_NAME="foundation-stereo-demo"
-CONDA_ENV="tiptop-foundation_stereo"
 
 # Check if tmux is installed
 if ! command -v tmux &> /dev/null; then
@@ -24,34 +23,23 @@ if tmux has-session -t "$SESSION_NAME" 2>/dev/null; then
     sleep 1
 fi
 
-# Get conda initialization
-CONDA_BASE=$(conda info --base 2>/dev/null)
-if [ -z "$CONDA_BASE" ]; then
-    echo "Error: conda not found. Please ensure conda is installed and in PATH."
-    exit 1
-fi
-
 # Create new tmux session with server
 echo "Creating tmux session '$SESSION_NAME'..."
 tmux new-session -d -s "$SESSION_NAME" -n "server-client"
 
 # In the first pane, start the server
-tmux send-keys -t "$SESSION_NAME:0.0" "source $CONDA_BASE/etc/profile.d/conda.sh" C-m
-tmux send-keys -t "$SESSION_NAME:0.0" "conda activate $CONDA_ENV" C-m
 tmux send-keys -t "$SESSION_NAME:0.0" "cd $SCRIPT_DIR/.." C-m
 tmux send-keys -t "$SESSION_NAME:0.0" "echo 'Starting FoundationStereo server...'" C-m
-tmux send-keys -t "$SESSION_NAME:0.0" "python scripts/server.py" C-m
+tmux send-keys -t "$SESSION_NAME:0.0" "pixi run python scripts/server.py" C-m
 
 # Split window horizontally (creates pane on the right)
 tmux split-window -h -t "$SESSION_NAME:0"
 
 # In the second pane, wait for server to start, then run client with retries
-tmux send-keys -t "$SESSION_NAME:0.1" "source $CONDA_BASE/etc/profile.d/conda.sh" C-m
-tmux send-keys -t "$SESSION_NAME:0.1" "conda activate $CONDA_ENV" C-m
 tmux send-keys -t "$SESSION_NAME:0.1" "cd $SCRIPT_DIR/.." C-m
 tmux send-keys -t "$SESSION_NAME:0.1" "echo 'Waiting for server to initialize (this may take 10-20 seconds)...'" C-m
 tmux send-keys -t "$SESSION_NAME:0.1" "sleep 10" C-m
-tmux send-keys -t "$SESSION_NAME:0.1" "for i in 1 2 3; do echo \"Attempt \$i of 3: Running client example...\"; python scripts/client_example.py && break || { echo \"Connection failed, waiting 5 seconds before retry...\"; sleep 5; }; done" C-m
+tmux send-keys -t "$SESSION_NAME:0.1" "for i in 1 2 3; do echo \"Attempt \$i of 3: Running client example...\"; pixi run python scripts/client_example.py && break || { echo \"Connection failed, waiting 5 seconds before retry...\"; sleep 5; }; done" C-m
 
 # Adjust pane sizes (50/50 split)
 tmux select-layout -t "$SESSION_NAME:0" even-horizontal
